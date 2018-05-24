@@ -4,9 +4,12 @@ const { spawn } = require('child_process'),
       path = require('path'),
       program = require('commander'),
       fs = require('fs'),
-      chromeLauncher = require('chrome-launcher')
+      chromeLauncher = require('chrome-launcher'),
+      ora = require('ora')
+      colors = require('colors'),
+      spinner = ora()
 
-let div = "============================================================",
+let div = colors.magenta("============================================================"),
     config = {
       "app": {
           "domain":   null,
@@ -43,13 +46,13 @@ if(typeof program.users === 'undefined') {
   }
 }
 if(typeof program.input === 'undefined') {
-  console.log("No input CSV file provided. Specify input file with `-i <file>`")
+  console.log(colors.red("No input CSV file provided. Specify input file with `-i <file>`"))
   process.exit(1);
 } else {
   config.input = untildify(program.input)
 }
 if(typeof program.output === 'undefined') {
-  console.log("No output path provided. Specify output path with `-i <file>`")
+  console.log(colors.red("No output path provided. Specify output path with `-i <file>`"))
   process.exit(1);
 } else {
   config.output = untildify(program.output)
@@ -58,12 +61,17 @@ if(typeof program.output === 'undefined') {
   }
 }
 if(typeof program.domain === 'undefined') {
-  console.log("No URL provided. Specify output file with `-d <url>`")
+  console.log(colors.red("No URL provided. Specify output file with `-d <url>`"))
   process.exit(1);
 } else {
   config.app.domain = 'https://' + program.domain
 }
-if(program.log) config.log = true
+if(program.log) {
+  config.log = true
+} else {
+  spinner.start(colors.yellow('Loading ' + config.app.domain))
+}
+
 
 const csv = require('csvtojson')
 csv()
@@ -76,11 +84,14 @@ csv()
       chromeFlags: ['--headless', '--disable-gpu', '--hide=scrollbars', '--crash-dumps-dir=' + config.path + '/tmp']
     }).then(chrome => {
       if(config.log) {
-        console.log("Command" + '\n' + div + '\n' + "Node path: " + process.argv[0] + '\n' + "Script path: " + process.argv[1])
-        console.log("Arguments: " + process.argv.slice(2,process.argv.length) + '\n\n')
-        console.log("Configuration" + '\n' + div + '\n' + "config: " + JSON.stringify(config, null, 2))
+        console.log('\n' + colors.magenta("Command")+ '\n' + div)
+        console.log(colors.blue("Node path:   ") + process.argv[0])
+        console.log(colors.blue("Script path: ") + process.argv[1])
+        console.log(colors.blue("Arguments:   ") + process.argv.slice(2,process.argv.length).toString() + '\n\n')
+        console.log(colors.magenta("Configuration") + '\n' +  div)
+        console.log("config: " + JSON.stringify(config, null, 2))
       }
-      run().catch(console.error.bind(console))
+      run().catch(console.error.bind(colors.red(console)))
       chrome.kill()
     })
   })
@@ -103,16 +114,23 @@ async function run() {
     }
   })
 
+  if(!config.log) spinner.succeed(colors.green("Loaded " + config.app.domain))
+
   for(let i = 0; i < config.screenshots.length; i++) {
+
     let url = config.app.domain + config.screenshots[i]["URL"],
         description = config.screenshots[i]["Description"],
         role = config.screenshots[i]["Role"],
         title = config.screenshots[i]["Title"],
         file = path.join(config.output, role + "-" + title + ".png")
 
+    if(!config.log) spinner.start(colors.yellow("Creating screenshot " + (i+1) + ": " + title + " [" + role + "]"))
+
     if(config.log) {
-      console.log('\n\n' + title + '\n' + description + '\n' + div)
-      console.log("Current Role: " + role + '\n' + "Current URL: " + url + '\n' + "Current output file: " + file + '\n')
+      console.log('\n\n' + colors.magenta(title) + '\n' + colors.magenta(description) + '\n' + div)
+      console.log(colors.blue("Current role: ") + role)
+      console.log(colors.blue("Current URL:  ") + url)
+      console.log(colors.blue("Output file:  ") + file + '\n')
     }
 
     switch(title) {
@@ -151,5 +169,11 @@ async function run() {
           .screenshot({filePath:file})
     }
   }
+
   await chromeless.end()
+
+  if(config.log) console.log('\n')
+  spinner.succeed(colors.green(config.screenshots.length + " screenshots created"))
+  if(!config.log) spinner.stop()
+
 }
