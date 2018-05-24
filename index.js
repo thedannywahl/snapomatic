@@ -49,7 +49,7 @@ if(typeof program.input === 'undefined') {
   config.input = untildify(program.input)
 }
 if(typeof program.output === 'undefined') {
-  console.log("No output CSV file provided. Specify output file with `-i <file>`")
+  console.log("No output path provided. Specify output path with `-i <file>`")
   process.exit(1);
 } else {
   config.output = untildify(program.output)
