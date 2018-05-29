@@ -7,7 +7,8 @@ const { spawn } = require('child_process'),
       chromeLauncher = require('chrome-launcher'),
       ora = require('ora')
       colors = require('colors'),
-      spinner = ora()
+      spinner = ora(),
+      csv = require('csvtojson')
 
 let div = colors.magenta("============================================================"),
     config = {
@@ -28,17 +29,15 @@ let div = colors.magenta("======================================================
 
 program
   .version('0.0.1')
+  .allowUnknownOption()
   .option('-l, --log', 'Enable console logging')
   .option('-i, --input <file>','required user input')
   .option('-o, --output <path>', 'output path')
   .option('-d, --domain <url>', 'domain')
-  .option('-u, --users <users>', 'users')
+  .option('-u, --users [users]', 'users')
   .parse(process.argv);
 
-if(typeof program.users === 'undefined') {
-  console.log("No users provided. Specify users with `-u <users>`")
-  process.exit(1);
-} else {
+if(typeof program.users !== 'undefined') {
   if(program.users.charAt(0) == "{") {
     config.app.users = JSON.parse(program.users)
   } else {
@@ -72,16 +71,14 @@ if(program.log) {
   spinner.start(colors.yellow('Loading ' + config.app.domain))
 }
 
-
-const csv = require('csvtojson')
 csv()
   .fromFile(config.input)
-  .then((jsonObj)=>{
+  .then(jsonObj=>{
     config.screenshots = jsonObj;
-  }).then((jsonObj)=>{
+  }).then(jsonObj=>{
     chromeLauncher.launch({
-      port: 9222,
-      chromeFlags: ['--headless', '--disable-gpu', '--hide=scrollbars', '--crash-dumps-dir=' + config.path + '/tmp']
+      port:        9222,
+      chromeFlags: ['--disable-gpu', '--crash-dumps-dir=/tmp', '--hide-scrollbars', '--headless']
     }).then(chrome => {
       if(config.log) {
         console.log('\n' + colors.magenta("Command")+ '\n' + div)
@@ -90,14 +87,17 @@ csv()
         console.log(colors.blue("Arguments:   ") + process.argv.slice(2,process.argv.length).toString() + '\n\n')
         console.log(colors.magenta("Configuration") + '\n' +  div)
         console.log("config: " + JSON.stringify(config, null, 2))
+        console.log('\n' + colors.magenta("Chrome")+ '\n' + div)
+        console.log(chrome)
       }
-      run().catch(console.error.bind(colors.red(console)))
-      chrome.kill()
+      if(!config.log) spinner.succeed(colors.green("Loaded " + config.app.domain))
+      run(chrome).catch(console.error.bind(colors.red(console)))
     })
   })
 
-async function run() {
+async function run(chrome) {
   const chromeless = new Chromeless({
+    launchChrome: false,
     "debug":        config.log,
     "implicitWait": true,
     "waitTimeout": 30000,
@@ -108,13 +108,11 @@ async function run() {
     },
     "cdp": {
       "host":     "127.0.0.1",
-      "port":     9222,
+      "port":     chrome.port,
       "secure":   false,
       "closeTab": true
     }
   })
-
-  if(!config.log) spinner.succeed(colors.green("Loaded " + config.app.domain))
 
   for(let i = 0; i < config.screenshots.length; i++) {
 
@@ -122,7 +120,7 @@ async function run() {
         description = config.screenshots[i]["Description"],
         role = config.screenshots[i]["Role"],
         title = config.screenshots[i]["Title"],
-        file = path.join(config.output, role + "-" + title + ".png")
+        file = (role !== '') ? path.join(config.output, role + "-" + title + ".png") : path.join(config.output, title + ".png")
 
     if(!config.log) spinner.start(colors.yellow("Creating screenshot " + (i+1) + ": " + title + " [" + role + "]"))
 
@@ -138,30 +136,9 @@ async function run() {
         await chromeless
           .goto(url)
           .screenshot({filePath:file})
-          .type(config.app.users[role]["username"], '#pseudonym_session_unique_id')
-          .type(config.app.users[role]["password"], '#pseudonym_session_password')
-          .click('.Button--login')
-        break;
-      case "dashboard-card":
-        await chromeless
-          .goto(url)
-          .click('#DashboardOptionsMenu_Container button')
-          .click('#application + span ul[role="menu"] li:first-child ul[role="group"] li:nth-child(1) span:nth-child(2)')
-          .wait('.ic-DashboardCard__header_hero')
-          .screenshot({filePath:file})
-        break;
-      case "dashboard-list":
-        await chromeless
-          .goto(url)
-          .click('#DashboardOptionsMenu_Container button')
-          .click('#application + span ul[role="menu"] li:first-child ul[role="group"] li:nth-child(2) span:nth-child(2)')
-          .wait('.PlannerApp h2')
-          .screenshot({filePath:file})
-        break;
-      case "logout":
-        await chromeless
-          .goto(url)
-          .click('#Button--logout-confirm')
+          .type(config.app.users[role]["username"], '#username')
+          .type(config.app.users[role]["password"], '#password')
+          .click('#login')
         break;
       default:
         await chromeless
@@ -171,6 +148,7 @@ async function run() {
   }
 
   await chromeless.end()
+  chrome.kill()
 
   if(config.log) console.log('\n')
   spinner.succeed(colors.green(config.screenshots.length + " screenshots created"))
