@@ -8,10 +8,10 @@ const { spawn } = require('child_process'),
       ora = require('ora')
       colors = require('colors'),
       spinner = ora(),
-      csv = require('csvtojson'),
-      workflow = require('./workflow')
+      csv = require('csvtojson')
 
-let div = colors.magenta("============================================================"),
+let workflow,
+    div = colors.magenta("============================================================"),
     config = {
       "size": {
         "height":     800,
@@ -33,7 +33,8 @@ program
   .option('-i, --input <file>','required user input')
   .option('-o, --output <path>', 'output path')
   .option('-d, --domain <url>', 'domain')
-  .option('-u, --users [users]', 'users')
+  .option('-u, --users <users>', 'users')
+  .option('-w, --workflow <workflow>', 'External workflow file')
   .parse(process.argv);
 
 if(typeof program.users !== 'undefined') {
@@ -42,6 +43,12 @@ if(typeof program.users !== 'undefined') {
   } else {
     config.users = JSON.parse(fs.readFileSync(program.users, 'utf8'));
   }
+}
+if(typeof program.workflow === 'undefined') {
+  workflow = require('./workflow')
+} else {
+  let path = program.workflow.slice(0, program.workflow.length - 3)
+  workflow = require(path)
 }
 if(typeof program.input === 'undefined') {
   console.log(colors.red("No input CSV file provided. Specify input file with `-i <file>`"))
