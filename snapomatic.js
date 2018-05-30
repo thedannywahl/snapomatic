@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { spawn } = require('child_process'),
       { Chromeless } = require('chromeless'),
       untildify = require('untildify'),
