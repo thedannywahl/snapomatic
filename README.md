@@ -1,7 +1,7 @@
 # Snapomatic
 Snapomatic is an automated screenshot utility which leverages headless chrome.
 
-![Snapomatic in process of capturing screenshots](https://raw.githubusercontent.com/thedannywahl/snapomatic/master/example/inprogress.png "Snapomatic in process of capturing screenshots")
+![Snapomatic in process of capturing screenshots](https://raw.githubusercontent.com/thedannywahl/snapomatic/master/examples/inprogress.png "Snapomatic in process of capturing screenshots")
 
 Snapomatic takes a CSV input file to process snapshots, and is capable of processing multiple users, allowing you to capture screenshots of different roles in a single pass.
 
