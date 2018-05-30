@@ -8,7 +8,8 @@ const { spawn } = require('child_process'),
       ora = require('ora')
       colors = require('colors'),
       spinner = ora(),
-      csv = require('csvtojson')
+      csv = require('csvtojson'),
+      snapomatic = require('./package.json')
 
 let workflow,
     div = colors.magenta("============================================================"),
@@ -27,14 +28,14 @@ let workflow,
     }
 
 program
-  .version('0.0.1')
+  .version(snapomatic.version)
   .allowUnknownOption()
-  .option('-l, --log', 'Enable console logging')
-  .option('-i, --input <file>','required user input')
-  .option('-o, --output <path>', 'output path')
-  .option('-d, --domain <url>', 'domain')
-  .option('-u, --users <users>', 'users')
-  .option('-w, --workflow <workflow>', 'External workflow file')
+  .option('-l, --log', 'enable console logging')
+  .option('-i, --input <file>','path to CSV input file')
+  .option('-o, --output <path>', 'path to output folder')
+  .option('-d, --domain <url>', 'domain to use with input file')
+  .option('-u, --users <users>', 'JSON users object')
+  .option('-w, --workflow <workflow>', 'path to external workflow file')
   .parse(process.argv);
 
 if(typeof program.users !== 'undefined') {
@@ -45,18 +46,18 @@ if(typeof program.users !== 'undefined') {
   }
 }
 if(typeof program.workflow === 'undefined') {
-  workflow = require('./workflow')
+  workflow = require('./workflow.js')
 } else {
-  workflow = require(program.workflow.slice(0, program.workflow.length - 3))
+  workflow = require(program.workflow)
 }
 if(typeof program.input === 'undefined') {
-  console.error(colors.red("No input CSV file provided. Specify input file with `-i <file>`"))
+  console.error(colors.red("✖ Error: No input CSV file provided. Specify input file with `-i <file>`"))
   process.exit(1);
 } else {
   config.input = untildify(program.input)
 }
 if(typeof program.output === 'undefined') {
-  console.error(colors.red("No output path provided. Specify output path with `-i <file>`"))
+  console.error(colors.red("✖ Error: No output folder provided. Specify output folder with `-i <file>`"))
   process.exit(1);
 } else {
   config.output = untildify(program.output)
@@ -65,15 +66,15 @@ if(typeof program.output === 'undefined') {
   }
 }
 if(typeof program.domain === 'undefined') {
-  console.error(colors.red("No URL provided. Specify output file with `-d <url>`"))
+  console.error(colors.red("✖ Error: No URL provided. Specify domain with `-d <url>`"))
   process.exit(1);
 } else {
   if(program.domain.startsWith('http://')) {
     if(typeof program.users === 'undefined') {
-      console.warn(colors.yellow("Warning: Running over http\n"))
+      console.warn(colors.yellow("⚠ Warning: Running over http\n"))
       config.domain = program.domain
     } else {
-      console.error(colors.red("Cannot process users over http.\nPlease specify https or remove users object."))
+      console.error(colors.red("✖ Error: Cannot process users over http.\n  Please specify https or remove users object."))
       process.exit(1);
     }
   } else if(program.domain.startsWith('https://')){
