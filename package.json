@@ -1,8 +1,11 @@
 {
   "name": "snapomatic",
-  "version": "0.0.1",
-  "description": "automated screenshot util",
-  "main": "index.js",
+  "version": "1.0.0",
+  "description": "An automated screenshot utility",
+  "main": "snapomatic.js",
+  "bin": {
+    "snapomatic": "./snapomatic.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
