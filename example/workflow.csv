@@ -1,7 +1,0 @@
-Title,URL,Role,Description
-login,/login,user,Normal user login
-dashboard,/dashboard,user,Normal user dashboard
-logout,/logout,user,user logout
-login,/admin/login,admin,Admin login page
-settings,/admin/config,admin,Admin config page
-logout,/admin/logout,admin,admin logout

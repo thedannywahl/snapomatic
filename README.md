@@ -16,6 +16,20 @@ To run snapomatic you must provide an input CSV, and output folder, and a domain
 snapomatic [--log] [-u users.json] [-w workflow.js] -i workflow.csv -o screenshots/ -d example.com
 ```
 
+### Examples
+
+The included `/examples` folder provides a couple of examples for usage.
+
+```bash
+snapomatic -i ./examples/wikipedia/wiki.csv -o ~/Desktop/snapomatic/wiki/ -d en.wikipedia.org
+````
+
+```bash
+snapomatic --log -w ./examples/google/work.js -i examples/google/google.csv -o ~/Desktop/snapomatic/google/ -d google.com
+```
+
+Examples of custom workflows `custom-workflow.js` and user objects `users.json` are provided for evaluation in the example folder as well.
+
 ### Users Object
 The users object can be a string passed directly to `-u` or an external json file.  The format for users is role, containing username and password.  Any number of roles can be passed.  Roles **must** match the role value passed in the CSV.
 
@@ -67,7 +81,7 @@ Specify the path where the output snapshots should be stored.  If the folder doe
 ### Workflow
 Snapomatic allows you to pass a custom workflow javascript file as a node module.  If a custom workflow is not passed, snapomatic will will use the builtin `workflow.js` module which simply saves a snapshot of the requested page.
 
-A custom workflow can use the methods provided by [chromeless](https://github.com/prismagraphql/chromeless/) to capture snapshots.  If you need to interact with a page (e.g. `/login`) simply add a `case` to the `switch` in your custom workflow with instructions for chromeless. The cases are named after the `title` from the CSV.
+A custom workflow can use the methods provided by [chromeless](https://github.com/prismagraphql/chromeless/) to capture snapshots.  If you need to interact with a page (e.g. `/login`) simply add a `case` to the `switch` in your custom workflow with instructions for chromeless. The cases are named after the `title` from the CSV.  URLs are not used because chromeless will follow redirects and you might end up on a different page than the one provided in the CSV.
 
 The example workflow below shows how to navigate a login page using chromeless, then continue taking screenshots.
 
@@ -97,6 +111,9 @@ exports.process = async function process(description, role, title, file, url, ch
 Add the flag `--log` for robust console debugging.
 
 Logging will output the current configuration, program args, executable paths, as well as information for each screenshot created when parsing the input CSV file.
+
+## Security
+snapomatic will **NOT** allow you to pass a roles object over http.  I don't care if the remote website allows it.  It will also warn when explicitly calling http, but will still run.  If no transit method is provided, it will default to https.
 
 ## Modules
 * [Chrome Launcher](https://github.com/GoogleChrome/chrome-launcher) automates launching headless Chrome in a streamlined way.
