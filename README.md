@@ -1,21 +1,37 @@
 # Snapomatic
-Snapomatic is a node.js tool to automate headless chrome and chromeless to crawl a website and capture screenshots.
+Snapomatic is an automated screenshot utility which leverages headless chrome.
 
 ![Snapomatic in process of capturing screenshots](https://raw.githubusercontent.com/thedannywahl/snapomatic/master/example/inprogress.png "Snapomatic in process of capturing screenshots")
 
-Snapomatic takes a csv input file to process snapshots, and is capable of processing multiple users, allowing you to capture screenshots of different roles in a single pass.
+Snapomatic takes a CSV input file to process snapshots, and is capable of processing multiple users, allowing you to capture screenshots of different roles in a single pass.
 
 ## Installing
 Download the [compiled binary](https://github.com/thedannywahl/snapomatic/releases/) or install via NPM with
 `npm i -g snapomatic`
 
 ## Instructions
-`snapomatic [-u ~/users.json] [-w ~/workflow.js] -i ~/workflow.csv -o ~/snaps -d example.com`
+To run snapomatic you must provide an input CSV, and output folder, and a domain.  Optional parameters include logging, custom workflow files, and user roles.  `--help` and `--version` are also built-in.
+
+```bash
+snapomatic [--log] [-u users.json] [-w workflow.js] -i workflow.csv -o screenshots/ -d example.com
+```
 
 ### Users Object
-Simply pass an input CSV, an output folder, a domain, and a users Object. The users object can simply be a string passed directly to `-u` or an external json file.  the format for users is role, containing username and password.  Any number of roles can be passed.  Roles **must** match the role value passed in the CSV.
+The users object can be a string passed directly to `-u` or an external json file.  The format for users is role, containing username and password.  Any number of roles can be passed.  Roles **must** match the role value passed in the CSV.
 
-`-u '{"admin":{"username":"pparker","password":"hunter2"}}'`
+An example of passing the role Object inline is provided below.
+
+```bash
+-u '{"admin":{"username":"pparker","password":"hunter2"}}'
+```
+
+An example of referencing an external json object is provided below
+
+```bash
+-u ~/path/to/users.json
+```
+
+With the JSON file containing the following information:
 
 ```javascript
 {
@@ -31,7 +47,13 @@ Simply pass an input CSV, an output folder, a domain, and a users Object. The us
 }
 ```
 
-For a login without a role, simply leave it as an empty string in both the JSON and the CSV.
+For a login without a role, simply leave it as an empty string in both the JSON and the CSV. An example of a single user with no role would look like:
+
+```bash
+-u '{"":{"username":"foo","password":"bar"}}'
+```
+
+An empty string is necessary to match an empty field in the CSV.
 
 ### Input File
 The included `users.json` and `workflow.csv` are provided as examples.  The CSV file has the following rows:
@@ -73,6 +95,8 @@ exports.process = async function process(description, role, title, file, url, ch
 
 ### Debugging
 Add the flag `--log` for robust console debugging.
+
+Logging will output the current configuration, program args, executable paths, as well as information for each screenshot created when parsing the input CSV file.
 
 ## Modules
 * [Chrome Launcher](https://github.com/GoogleChrome/chrome-launcher) automates launching headless Chrome in a streamlined way.
