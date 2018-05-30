@@ -6,7 +6,7 @@ Snapomatic is a node.js tool to automate headless chrome and chromeless to crawl
 Snapomatic takes a csv input file to process snapshots, and is capable of processing multiple users, allowing you to capture screenshots of different roles in a single pass.
 
 ## Instructions
-`./index.js [-u ~/users.json] [-w ~/workflow.js] -i ~/workflow.csv -o ~/snaps -d example.com`
+`snapomatic [-u ~/users.json] [-w ~/workflow.js] -i ~/workflow.csv -o ~/snaps -d example.com`
 
 ### Users Object
 Simply pass an input CSV, an output folder, a domain, and a users Object. The users object can simply be a string passed directly to `-u` or an external json file.  the format for users is role, containing username and password.  Any number of roles can be passed.  Roles **must** match the role value passed in the CSV.
