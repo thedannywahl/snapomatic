@@ -2,6 +2,7 @@ const { spawn } = require('child_process'),
       { Chromeless } = require('chromeless'),
       untildify = require('untildify'),
       program = require('commander'),
+      path = require('path'),
       fs = require('fs'),
       chromeLauncher = require('chrome-launcher'),
       ora = require('ora')
@@ -46,17 +47,16 @@ if(typeof program.users !== 'undefined') {
 if(typeof program.workflow === 'undefined') {
   workflow = require('./workflow')
 } else {
-  let path = program.workflow.slice(0, program.workflow.length - 3)
-  workflow = require(path)
+  workflow = require(program.workflow.slice(0, program.workflow.length - 3))
 }
 if(typeof program.input === 'undefined') {
-  console.log(colors.red("No input CSV file provided. Specify input file with `-i <file>`"))
+  console.error(colors.red("No input CSV file provided. Specify input file with `-i <file>`"))
   process.exit(1);
 } else {
   config.input = untildify(program.input)
 }
 if(typeof program.output === 'undefined') {
-  console.log(colors.red("No output path provided. Specify output path with `-i <file>`"))
+  console.error(colors.red("No output path provided. Specify output path with `-i <file>`"))
   process.exit(1);
 } else {
   config.output = untildify(program.output)
@@ -65,10 +65,22 @@ if(typeof program.output === 'undefined') {
   }
 }
 if(typeof program.domain === 'undefined') {
-  console.log(colors.red("No URL provided. Specify output file with `-d <url>`"))
+  console.error(colors.red("No URL provided. Specify output file with `-d <url>`"))
   process.exit(1);
 } else {
-  config.domain = 'https://' + program.domain
+  if(program.domain.startsWith('http://')) {
+    if(typeof program.users === 'undefined') {
+      console.warn(colors.yellow("Warning: Running over http\n"))
+      config.domain = program.domain
+    } else {
+      console.error(colors.red("Cannot process users over http.\nPlease specify https or remove users object."))
+      process.exit(1);
+    }
+  } else if(program.domain.startsWith('https://')){
+    config.domain = program.domain
+  } else {
+    config.domain = 'https://' + program.domain
+  }
 }
 if(program.log) {
   config.log = true
