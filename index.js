@@ -8,7 +8,9 @@ const { spawn } = require('child_process'),
       ora = require('ora')
       colors = require('colors'),
       spinner = ora(),
-      csv = require('csvtojson')
+      csv = require('csvtojson'),
+      workflow = require('./workflow'),
+      logger = require('./logger')
 
 let div = colors.magenta("============================================================"),
     config = {
@@ -120,9 +122,10 @@ async function run(chrome) {
         description = config.screenshots[i]["Description"],
         role = config.screenshots[i]["Role"],
         title = config.screenshots[i]["Title"],
-        file = (role !== '') ? path.join(config.output, role + "-" + title + ".png") : path.join(config.output, title + ".png")
+        file = (role !== '') ? path.join(config.output, role + "-" + title + ".png") : path.join(config.output, title + ".png"),
+        indicator = (role == '') ? '' : " [" + role + "]"
 
-    if(!config.log) spinner.start(colors.yellow("Creating screenshot " + (i+1) + ": " + title + " [" + role + "]"))
+    if(!config.log) spinner.start(colors.yellow("Creating screenshot " + (i+1) + ": " + title + indicator))
 
     if(config.log) {
       console.log('\n\n' + colors.magenta(title) + '\n' + colors.magenta(description) + '\n' + div)
@@ -131,20 +134,8 @@ async function run(chrome) {
       console.log(colors.blue("Output file:  ") + file + '\n')
     }
 
-    switch(title) {
-      case "login":
-        await chromeless
-          .goto(url)
-          .screenshot({filePath:file})
-          .type(config.app.users[role]["username"], '#username')
-          .type(config.app.users[role]["password"], '#password')
-          .click('#login')
-        break;
-      default:
-        await chromeless
-          .goto(url)
-          .screenshot({filePath:file})
-    }
+    workflow.process(description, role, title, file, url, chromeless, config)
+
   }
 
   await chromeless.end()
