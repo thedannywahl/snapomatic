@@ -131,7 +131,7 @@ async function run(chrome) {
       console.log(colors.blue("Output file:  ") + file + '\n')
     }
 
-    workflow.process(description, role, title, file, url, chromeless, config)
+    await workflow.process(description, role, title, file, url, chromeless, config)
 
   }
 
