@@ -1,7 +1,6 @@
 const { spawn } = require('child_process'),
       { Chromeless } = require('chromeless'),
       untildify = require('untildify'),
-      path = require('path'),
       program = require('commander'),
       fs = require('fs'),
       chromeLauncher = require('chrome-launcher'),
