@@ -28,8 +28,6 @@ snapomatic -i ./examples/wikipedia/wiki.csv -o ~/Desktop/snapomatic/wiki/ -d en.
 snapomatic --log -w ./examples/google/work.js -i examples/google/google.csv -o ~/Desktop/snapomatic/google/ -d google.com
 ```
 
-Examples of custom workflows `custom-workflow.js` and user objects `users.json` are provided for evaluation in the example folder as well.
-
 ### Users Object
 The users object can be a string passed directly to `-u` or an external json file.  The format for users is role, containing username and password.  Any number of roles can be passed.  Roles **must** match the role value passed in the CSV.
 
