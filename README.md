@@ -6,7 +6,7 @@ Snapomatic is a node.js tool to automate headless chrome and chromeless to crawl
 Snapomatic takes a csv input file to process snapshots, and is capable of processing multiple users, allowing you to capture screenshots of different roles in a single pass.
 
 ## Installing
-
+Download the [compiled binary](https://github.com/thedannywahl/snapomatic/releases/) or install via NPM with
 `npm i -g snapomatic`
 
 ## Instructions
@@ -43,7 +43,6 @@ Role-Title is used to name each snapshot, so for example `user-dashboard` and `a
 Specify the path where the output snapshots should be stored.  If the folder doesn't exist, it will be created.  Snapomatic will overwrite any images in the output folder with the same name.  Output will be saved as `role-title.png` if a role was provided or `title.png` if a role was not provided.
 
 ### Workflow
-
 Snapomatic allows you to pass a custom workflow javascript file as a node module.  If a custom workflow is not passed, snapomatic will will use the builtin `workflow.js` module which simply saves a snapshot of the requested page.
 
 A custom workflow can use the methods provided by [chromeless](https://github.com/prismagraphql/chromeless/) to capture snapshots.  If you need to interact with a page (e.g. `/login`) simply add a `case` to the `switch` in your custom workflow with instructions for chromeless. The cases are named after the `title` from the CSV.
@@ -76,7 +75,6 @@ exports.process = async function process(description, role, title, file, url, ch
 Add the flag `--log` for robust console debugging.
 
 ## Modules
-
 * [Chrome Launcher](https://github.com/GoogleChrome/chrome-launcher) automates launching headless Chrome in a streamlined way.
 * [Chromeless](https://github.com/prismagraphql/chromeless/) provides methods for automating Chrome.
 * [Colors](https://github.com/Marak/colors.js) for colorful console output.
