@@ -11,7 +11,8 @@ const { spawn } = require('child_process'),
       colors = require('colors'),
       spinner = ora(),
       csv = require('csvtojson'),
-      snapomatic = require('./package.json')
+      snapomatic = require('./package.json'),
+      mkdirp = require('mkdirp')
 
 let workflow,
     div = colors.magenta("============================================================"),
@@ -64,7 +65,7 @@ if(typeof program.output === 'undefined') {
 } else {
   config.output = untildify(program.output)
   if (!fs.existsSync(config.output)){
-    fs.mkdirSync(config.output);
+    mkdirp(config.output);
   }
 }
 if(typeof program.domain === 'undefined') {
@@ -152,7 +153,7 @@ async function run(chrome) {
       console.log(colors.blue("Output file:  ") + file + '\n')
     }
 
-    await workflow.process(description, role, title, file, url, chromeless, config)
+    await workflow.process(description, role, title, {filePath:file}, url, chromeless, config)
 
   }
 
