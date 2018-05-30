@@ -72,3 +72,24 @@ exports.process = async function process(description, role, title, file, url, ch
 Add the flag `--log` for robust console debugging.
 
 ## Modules
+
+### chrome-launcher
+[Chrome Launcher](https://github.com/GoogleChrome/chrome-launcher) automates launching headless Chrome in a streamlined way.
+
+### chromeless
+[Chromeless](https://github.com/prismagraphql/chromeless/) provides methods for automating Chrome.
+
+### colors
+[Colors](https://github.com/Marak/colors.js) for colorful console output.
+
+### commander
+[Commander](https://github.com/tj/commander.js) provides option parsing for CLI.
+
+### csvtojson
+[csvtojson](https://github.com/Keyang/node-csvtojson) provides CSV parsing for workflows.
+
+### ora
+[ora](https://github.com/sindresorhus/ora) renders spinner when `--log` is omitted.
+
+### untildify
+[untildify](https://github.com/sindresorhus/untildify) allows `~` in params.
