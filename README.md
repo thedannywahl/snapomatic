@@ -35,28 +35,26 @@ The included `users.json` and `workflow.csv` are provided as examples.  The CSV 
 Role-Title is used to name each snapshot, so for example `user-dashboard` and `admin-dashboard` would be saved based on the current role.  Description describes what the screenshot is capturing.  This is useful for debugging.
 
 ### debugging
+
 Add the flag `--log` for robust console debugging.
 
 ## Interacting
 
-Snapomatic loops through the CSV rows and uses (chromeless)[https://github.com/prismagraphql/chromeless/] to capture snapshots.  If you need to interact with a page (e.g. `/login`) simply add a `case` to the main `switch` with instructions for chromeless. The cases are named after the `title` from the CSV.
+Snapomatic loops through the CSV rows and uses (https://github.com/prismagraphql/chromeless/)[chromeless] to capture snapshots.  If you need to interact with a page (e.g. `/login`) simply add a `case` to the `switch` in the workflow module (`workflow.js`) with instructions for chromeless. The cases are named after the `title` from the CSV.
 
 ```
 case "login":
   await chromeless
     .goto(url)
     .screenshot({filePath:file})
-    .type(config.app.users[role]["username"], '#username')
-    .type(config.app.users[role]["password"], '#password')
+    .type(config.users[role]["username"], '#username')
+    .type(config.users[role]["password"], '#password')
     .click('#login')
   break;
-```
-
-the switch default simply navigates to the page and captures a screenshot, it is not necessary to add a case for every page, only those which require specific interaction.
-
-```
 default:
-  await chromeless
-    .goto(url)
-    .screenshot({filePath:file})
+    await chromeless
+      .goto(url)
+      .screenshot({filePath:file})
 ```
+
+The switch default simply navigates to the page and captures a screenshot, it is not necessary to add a case for every page, only those which require specific interaction.
