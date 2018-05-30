@@ -9,9 +9,7 @@ const { spawn } = require('child_process'),
       colors = require('colors'),
       spinner = ora(),
       csv = require('csvtojson'),
-      workflow = require('./workflow'),
-      logger = require('./logger')
-
+      workflow = require('./workflow')
 let div = colors.magenta("============================================================"),
     config = {
       "app": {
