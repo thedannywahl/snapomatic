@@ -12,15 +12,13 @@ const { spawn } = require('child_process'),
       workflow = require('./workflow')
 let div = colors.magenta("============================================================"),
     config = {
-      "app": {
-          "domain":   null,
-          "users":    null
-      },
       "size": {
         "height":     800,
         "width":      1280,
         "scale":      1
       },
+      "users":        {},
+      "domain":       null,
       "input":        null,
       "output":       null,
       "screenshots":  [],
@@ -39,9 +37,9 @@ program
 
 if(typeof program.users !== 'undefined') {
   if(program.users.charAt(0) == "{") {
-    config.app.users = JSON.parse(program.users)
+    config.users = JSON.parse(program.users)
   } else {
-    config.app.users = JSON.parse(fs.readFileSync(program.users, 'utf8'));
+    config.users = JSON.parse(fs.readFileSync(program.users, 'utf8'));
   }
 }
 if(typeof program.input === 'undefined') {
@@ -63,12 +61,12 @@ if(typeof program.domain === 'undefined') {
   console.log(colors.red("No URL provided. Specify output file with `-d <url>`"))
   process.exit(1);
 } else {
-  config.app.domain = 'https://' + program.domain
+  config.domain = 'https://' + program.domain
 }
 if(program.log) {
   config.log = true
 } else {
-  spinner.start(colors.yellow('Loading ' + config.app.domain))
+  spinner.start(colors.yellow('Loading ' + config.domain))
 }
 
 csv()
@@ -90,7 +88,7 @@ csv()
         console.log('\n' + colors.magenta("Chrome")+ '\n' + div)
         console.log(chrome)
       }
-      if(!config.log) spinner.succeed(colors.green("Loaded " + config.app.domain))
+      if(!config.log) spinner.succeed(colors.green("Loaded " + config.domain))
       run(chrome).catch(console.error.bind(colors.red(console)))
     })
   })
@@ -116,7 +114,7 @@ async function run(chrome) {
 
   for(let i = 0; i < config.screenshots.length; i++) {
 
-    let url = config.app.domain + config.screenshots[i]["URL"],
+    let url = config.domain + config.screenshots[i]["URL"],
         description = config.screenshots[i]["Description"],
         role = config.screenshots[i]["Role"],
         title = config.screenshots[i]["Title"],
