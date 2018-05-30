@@ -10,6 +10,7 @@ const { spawn } = require('child_process'),
       spinner = ora(),
       csv = require('csvtojson'),
       workflow = require('./workflow')
+
 let div = colors.magenta("============================================================"),
     config = {
       "size": {
@@ -22,7 +23,7 @@ let div = colors.magenta("======================================================
       "input":        null,
       "output":       null,
       "screenshots":  [],
-      "log":        false
+      "log":          false
     }
 
 program
