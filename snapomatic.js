@@ -65,7 +65,19 @@ if(typeof program.output === 'undefined') {
 } else {
   config.output = untildify(program.output)
   if (!fs.existsSync(config.output)){
-    mkdirp(config.output);
+    if(typeof program.users !== 'undefined') {
+      for(let i=0; i < Object.keys(config.users).length; i++) {
+        mkdirp(config.output + '/' + Object.keys(config.users)[i])
+      }
+    } else {
+      mkdirp(config.output);
+    }
+  } else {
+    if(typeof program.users !== 'undefined') {
+      for(let i=0; i < Object.keys(config.users).length; i++) {
+        mkdirp(config.output + '/' + Object.keys(config.users)[i])
+      }
+    }
   }
 }
 if(typeof program.domain === 'undefined') {
@@ -141,8 +153,9 @@ async function run(chrome) {
         description = config.screenshots[i]["Description"],
         role = config.screenshots[i]["Role"],
         title = config.screenshots[i]["Title"],
-        file = (role !== '') ? path.join(config.output, role + "-" + title + ".png") : path.join(config.output, title + ".png"),
-        indicator = (role == '') ? '' : " [" + role + "]"
+        indicator = (role == '') ? role : " (" + role + ")",
+        file = path.join(config.output + '/' + role, title + indicator + ".png")
+
 
     if(!config.log) spinner.start(colors.yellow("Creating screenshot " + (i+1) + ": " + title + indicator))
 
