@@ -55,13 +55,13 @@ if(typeof program.workflow === 'undefined') {
 }
 if(typeof program.input === 'undefined') {
   console.error(colors.red("✖ Error: No input CSV file provided. Specify input file with `-i <file>`"))
-  process.exit(1);
+  process.exit(1)
 } else {
   config.input = untildify(program.input)
 }
 if(typeof program.output === 'undefined') {
   console.error(colors.red("✖ Error: No output folder provided. Specify output folder with `-i <file>`"))
-  process.exit(1);
+  process.exit(1)
 } else {
   config.output = untildify(program.output)
   if (!fs.existsSync(config.output)){
@@ -82,7 +82,7 @@ if(typeof program.output === 'undefined') {
 }
 if(typeof program.domain === 'undefined') {
   console.error(colors.red("✖ Error: No URL provided. Specify domain with `-d <url>`"))
-  process.exit(1);
+  process.exit(1)
 } else {
   if(program.domain.startsWith('http://')) {
     if(typeof program.users === 'undefined') {
@@ -90,7 +90,7 @@ if(typeof program.domain === 'undefined') {
       config.domain = program.domain
     } else {
       console.error(colors.red("✖ Error: Cannot process users over http.\n  Please specify https or remove users object."))
-      process.exit(1);
+      process.exit(1)
     }
   } else if(program.domain.startsWith('https://')){
     config.domain = program.domain
@@ -124,7 +124,12 @@ csv()
         console.log(chrome)
       }
       if(!config.log) spinner.succeed(colors.green("Loaded " + config.domain))
-      run(chrome).catch(console.error.bind(colors.red(console)))
+      run(chrome).catch(function(error){
+        if(!config.log) spinner.stop()
+        console.error(colors.red("✖ Error: Unable to process workflow. Debug log:"))
+        console.error(error)
+        process.exit(1)
+      })
     })
   })
 
